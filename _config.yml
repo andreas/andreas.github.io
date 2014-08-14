@@ -1,0 +1,22 @@
+# Dependencies
+markdown:         redcarpet
+highlighter:      pygments
+
+# Permalinks
+permalink:        pretty
+
+# Setup
+title:            Andreas Garnæs
+tagline:          
+url:              http://andreas.github.io
+paginate:         1
+baseurl:          /
+author:
+  name:           Andreas Garnæs
+  url:            https://twitter.com/cuvius
+  email:          andreas@garnaes.dk
+
+# Custom vars
+version:          1.0.0
+github:
+  repo:           https://github.com/andreas
