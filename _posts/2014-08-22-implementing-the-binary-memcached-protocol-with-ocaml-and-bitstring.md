@@ -259,4 +259,4 @@ Obvious this is still a very low level interface, but it's easy to build on top 
 
 ### Next time...
 
-In this blog post we've developed a primitive Ocaml library for talking to Memcached with the binary protocol using [bitstring](https://code.google.com/p/bitstring/). In this blog post we've stuck to the standard library, which is honest not that great, and all IO is synchronous. In the next installment we'll try using [Core](https://ocaml.janestreet.com/ocaml-core/latest/doc/) and [Async](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html) for asynchronous IO. Stay tuned!
+In this blog post we've developed a primitive Ocaml library for talking to Memcached with the binary protocol using [bitstring](https://code.google.com/p/bitstring/). The code is based on the standard library, which is honest not that great, and all IO is synchronous. In the next installment we'll try using [Core](https://ocaml.janestreet.com/ocaml-core/latest/doc/) and [Async](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html) for asynchronous IO. Stay tuned!
