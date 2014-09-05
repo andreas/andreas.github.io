@@ -220,8 +220,8 @@ let write_packet channel packet =
 (*  read_body : header -> in_channel -> packet option *)
 let read_body header channel =
   let body_length  = Int32.to_int header.body_length                        in
-  let bits         = Bitstring.bitstring_of_chan_max channel body_length    in
   let value_length = body_length - header.extras_length - header.key_length in
+  let bits         = Bitstring.bitstring_of_chan_max channel body_length    in
   bitmatch bits with
     | { extras : 8*header.extras_length : bitstring;
         key    : 8*header.key_length    : string;
