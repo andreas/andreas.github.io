@@ -5,7 +5,7 @@ title: Home
 
 <div class="posts">
   {% for post in paginator.posts %}
-    {% if !post.private %}
+    {% if site.show_drafts || !post.private %}
     <div class="post">
       <h1 class="post-title">
         <a href="{{ post.url }}">
