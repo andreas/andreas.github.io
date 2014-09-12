@@ -33,7 +33,7 @@ Async_suite.(
     )
   
   |> test "set" (fun cache ->
-    Bool.assert_equal (Cache.set cache "foo" "bar") true
+    Bool.assert_equal (Memcached.set cache "foo" "bar") true
   )
 
   (* add more tests here ...
@@ -158,8 +158,8 @@ The signature `Assertable` ensures we can compare and print values of some type 
 These asserters make it easy to write concise assertions:
 
 {% highlight ocaml %}
-String.assert_equal (Cache.get  cache "mykey") "foo"
-Int64.assert_equal  (Cache.incr cache "count") 42L
+String.assert_equal (Memcached.get  cache "mykey") "foo"
+Int64.assert_equal  (Memcached.incr cache "count") 42L
 {% endhighlight %}
 
 ### Wrap up
