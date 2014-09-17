@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Testing Ocaml code with Async
+hidden: true
 ---
 
 In the [previous blog post](...), we used [Core](https://github.com/janestreet/core) and [Async](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html) to write a tiny library for talking to Memcached using the binary protocol. I wanted to write tests for the library in a readable and succint manner to ensure correctness -- the type system cannot ensure binary data is parsed correctly after all. The regular go-to tool for testing Ocaml code is [OUnit](http://ounit.forge.ocamlcore.org/api-ounit/index.html), but this doesn't work well with Async. As I couldn't find a suitable library, I decided to write something myself.
