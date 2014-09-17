@@ -120,11 +120,11 @@ let main () =
   Reader.close reader >>| fun () ->
   match response with
   | Some packet when packet.header.status = 0 ->
-      Format.printf "Found value: %s\n" packet.value
+      printf "Found value: %s\n" packet.value
   | Some packet ->
-      Format.printf "Key not found"
+      printf "Key not found"
   | None ->
-      Format.printf "Request failed"
+      printf "Request failed"
 in
 main ();
 Scheduler.go ()
