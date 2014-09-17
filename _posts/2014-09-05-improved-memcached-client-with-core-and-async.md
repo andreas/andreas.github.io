@@ -1,7 +1,6 @@
 ---
 layout: post
 title: Improved Memcached client with Core and Async
-private: true
 ---
 
 In the [previous blog post]({% post_url 2014-08-22-implementing-the-binary-memcached-protocol-with-ocaml-and-bitstring %}), we implemented a simple Ocaml library for talking to Memcached with the binary protocol using [bitstring](https://code.google.com/p/bitstring/). The code uses the baked-in standard library and synchronous IO (blocking), so a lot of time will be wasted waiting for IO. The standard library replacement [Core](https://github.com/janestreet/core) offers cooperative threading with callbacks through [Async](https://github.com/janestreet/async), similar to Javascript, [EventMachine](http://rubyeventmachine.com/) for Ruby or many others. In this blog post we'll try to rewrite the code from the previous post to use asynchronous IO with [Async](https://github.com/janestreet/async).
