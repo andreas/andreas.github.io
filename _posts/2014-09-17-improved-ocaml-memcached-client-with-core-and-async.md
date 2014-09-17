@@ -133,3 +133,5 @@ Scheduler.go ()
 ### Recap
 
 So what did we gain by rewriting our IO to use Core/Async rather than the built-in standard library? In short, our Memcached client library will play nice with other Async code and will scale much more nicely, e.g. if being used as part of a web server based on Async. As noted a couple of times during the rewrite, Async and bitstring doesn't play very well together. We both need to allocate temporary strings and convert between string and bitstring in multiple places. In a future post I'll discuss other ways of using Reader/Writer which is more efficient.
+
+If you liked this post, please vote on [Hacker News](https://news.ycombinator.com/item?id=8329535).
