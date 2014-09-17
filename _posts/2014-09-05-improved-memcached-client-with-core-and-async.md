@@ -4,15 +4,15 @@ title: Improved Memcached client with Core and Async
 private: true
 ---
 
-In the [previous blog post](/2014/08/22/implementing-the-binary-memcached-protocol-with-ocaml-and-bitstring/), we implemented a simple Ocaml library for talking to Memcached with the binary protocol using [bitstring](https://code.google.com/p/bitstring/). The code uses the baked-in standard library and synchronous IO (blocking), so a lot of time will be wasted waiting for IO. The standard library replacement [Core](https://github.com/janestreet/core) offers cooperative threading with callbacks through [Async](https://github.com/janestreet/async), similar to Javascript, [EventMachine](http://rubyeventmachine.com/) for Ruby or many others. In this blog post we'll try to rewrite the code from the previous post to use asynchronous IO with [Async](https://github.com/janestreet/async).
+In the [previous blog post]({% post_url 2014-08-22-implementing-the-binary-memcached-protocol-with-ocaml-and-bitstring %}), we implemented a simple Ocaml library for talking to Memcached with the binary protocol using [bitstring](https://code.google.com/p/bitstring/). The code uses the baked-in standard library and synchronous IO (blocking), so a lot of time will be wasted waiting for IO. The standard library replacement [Core](https://github.com/janestreet/core) offers cooperative threading with callbacks through [Async](https://github.com/janestreet/async), similar to Javascript, [EventMachine](http://rubyeventmachine.com/) for Ruby or many others. In this blog post we'll try to rewrite the code from the previous post to use asynchronous IO with [Async](https://github.com/janestreet/async).
 
 ### IO with Async
 
 The primary IO abstractions in the Ocaml standard library are [in\_channel and out\_channel](http://caml.inria.fr/pub/docs/manual-ocaml/libref/Pervasives.html#6_Inputoutput), while in Core/Async it's [Reader](https://ocaml.janestreet.com/ocaml-core/111.17.00/doc/async/#Std.Reader) and [Writer](https://ocaml.janestreet.com/ocaml-core/111.17.00/doc/async/#Std.Writer). Reading and writing with Core/Async is asynchronous (non-blocking), so results are not returned immediately. If we for example examine the signature of `Reader.really_read` it looks like this:
 
 {% highlight ocaml %}
-(* really_read t pos len buffer reads until it fills len bytes of buffer starting at
-   pos or runs out of input.` *)
+(* really_read t pos len buffer reads until it fills len bytes of buffer starting *)
+(* at pos or runs out of input.`                                                  *)
 val really_read : Reader.t -> ?pos:int -> ?len:int -> string ->
                     [ `Eof of int | `Ok ] Deferred.t
 {% endhighlight %}
@@ -21,7 +21,6 @@ The type `'a Deferred.t` signifies that the result of type `'a` is not immediate
 
 {% highlight ocaml %}
 (* Deferred.bind : 'a Deferred.t -> ('a -> 'b Deferred.t) -> 'b Deferred.t *)
-
 let buf = String.create 10 in
 let dfd = Reader.really_read my_reader 0 10 buf in
 Deferred.bind dfd (function
@@ -61,17 +60,17 @@ We've covered enough to update the client library to use Async now, but if you w
 
 ### Updating the Client
 
-We can reuse the code from [the last post](), which doesn't touch IO. All the functions `read_*` or `write_*` needs to be rewritten to be asynchronous though. Let's start by writing a packet:
+We can reuse the code from [the last post]({% post_url 2014-08-22-implementing-the-binary-memcached-protocol-with-ocaml-and-bitstring %}), which doesn't touch IO. All the functions `read_*` or `write_*` needs to be rewritten to be asynchronous though. Let's start by writing a packet:
 
 {% highlight ocaml %}
 (* write_packet : Writer.t -> packet -> unit *)
 let write_packet writer packet =
   let header_bits = header_to_bitstring packet.header in
-  Writer.write writer (Bitstring.to_string header_bits);
-  Writer.write writer (Bitstring.to_string extras);
+  Writer.write writer (Bitstring.string_of_bitstring header_bits);
+  Writer.write writer (Bitstring.string_of_bitstring packet.extras);
   Writer.write writer packet.key;
   Writer.write writer packet.value
-{% endhighlight%}
+{% endhighlight %}
 
 This is almost identical to the previous version and doesn't even introduce any deferreds. Note that we have to convert our bitstrings to strings though, while we could previously emit them directly to the channel (e.g. `Bitstring.to_chan out_chan header_bits`). The bitstring library was not built with Async in mind.
 
@@ -83,17 +82,17 @@ let read_header reader =
   let header_buffer = String.create 24 in
   Reader.really_read reader ~len:24 header_buffer >>| function
     | `Eof _ -> None
-    | `Ok    -> Some (header_of_bitstring (Bitstring.of_string header_buffer)) 
+    | `Ok    -> header_of_bitstring (Bitstring.bitstring_of_string header_buffer)
 
 (* read_body : header -> Reader.t -> packet option Deferred.t *)
 let read_body header reader =
-  let body_length  = Int32.to_int header.body_length                        in
+  let body_length  = Int32.to_int_exn header.body_length                    in
   let value_length = body_length - header.extras_length - header.key_length in
   let body_buffer  = String.create body_length                              in
   Reader.really_read reader ~len:body_length body_buffer >>| function
     | `Eof _ -> None
     | `Ok    -> 
-      bitmatch Bitstring.of_string body_buffer with
+      bitmatch Bitstring.bitstring_of_string body_buffer with
         | { extras : 8*header.extras_length : bitstring;
             key    : 8*header.key_length    : string;
             value  : 8*value_length         : string
@@ -102,9 +101,9 @@ let read_body header reader =
 
 (* read_response_packet : Reader.t -> packet option Deferred.t *)
 let read_response_packet reader =
-  match reader_header reader with
+  read_header reader >>= function
   | Some header -> read_body header reader
-  | None -> None
+  | None -> return None
 {% endhighlight %}
 
 Like before, there's a slight mismatch between Async and bitstring, and we have to convert between string and bitstring.
@@ -114,19 +113,19 @@ Finally, we can now write our small sample program again which connects to a loc
 {% highlight ocaml %}
 let main () =
   let host_and_port = Tcp.to_host_and_port "localhost" 12211 in
-  Tcp.connect host_and_port >>> fun (_, reader, writer) ->
-  let req = make_Request_packet 0 "foo" "" Bigstring.empty_bitstring in
-  write_packet writer req >>= fun () ->
-  read_packet reader >>= function
-    | Some packet when packet.header.status = 0 ->
-      Format.printf "Found value: %s\n" packet.value
-    | Some packet ->
-      Format.printf "Key not found"
-    | None ->
-      Format.printf "Request failed"
-  ;
+  Tcp.connect host_and_port >>= fun (_, reader, writer) ->
+  let req = make_request_packet 0 "foo" "" Bitstring.empty_bitstring in
+  write_packet writer req;
+  read_response_packet reader >>= fun response ->
   Writer.close writer >>= fun () ->
-  Reader.close reader
+  Reader.close reader >>| fun () ->
+  match response with
+  | Some packet when packet.header.status = 0 ->
+      Format.printf "Found value: %s\n" packet.value
+  | Some packet ->
+      Format.printf "Key not found"
+  | None ->
+      Format.printf "Request failed"
 in
 main ();
 Scheduler.go ()
