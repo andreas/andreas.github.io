@@ -1,17 +1,16 @@
 ---
 layout: post
 title: How to test Async Ocaml code
-hidden: true
 ---
 
-In the [previous blog post]({% post_url 2014-09-17-improved-ocaml-memcached-client-with-core-and-async %}), we used [Core](https://github.com/janestreet/core) and [Async](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html) to write a tiny library for talking to Memcached using the binary protocol. I wanted to write tests for the library in a readable and succint manner to ensure correctness -- the type system cannot ensure binary data is parsed correctly after all. The regular go-to tool for testing Ocaml code is [OUnit](http://ounit.forge.ocamlcore.org/api-ounit/index.html), but this doesn't work well with Async. As I couldn't find a suitable library, I decided to write something myself.
+In the [previous blog post]({% post_url 2014-09-17-improved-ocaml-memcached-client-with-core-and-async %}), we used [Core](https://github.com/janestreet/core) and [Async](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html) to write a tiny library for talking to Memcached using the [binary protocol]({% post_url 2014-08-22-implementing-the-binary-memcached-protocol-with-ocaml-and-bitstring  %}). I wanted to write tests for the library in a readable and succint manner to ensure correctness -- the type system cannot ensure binary data is parsed correctly after all. The regular go-to tool for testing Ocaml code is [OUnit](http://ounit.forge.ocamlcore.org/api-ounit/index.html), but this doesn't work well with Async. As I couldn't find a suitable library, I decided to write something myself.
 
 ### The Goal
 
 My goal was to write a tiny testing framework with the following features:
 
-- Compatible with Async.
-- Assertions with informative output on failure and type-aware equality.
+- Easily write tests for code using Async.
+- Assertions with informative output and type-aware equality.
 - Before test suite setup function, e.g. connect to Memcached.
 - Before test setup function, e.g. prepare some data in Memcached.
 - After test teardown function, e.g. flush Memcached.
@@ -33,8 +32,12 @@ Async_suite.(
       Memcached.close cache
     )
   
-  |> test "set" (fun cache ->
+  |> test "setting a value" (fun cache ->
     Bool.assert_equal (Memcached.set cache "foo" "bar") true
+  )
+
+  |> test "getting a value" (fun cache ->
+    String.assert_equal (Memcached.get cache "mykey") "myvalue"
   )
 
   (* add more tests here ...
@@ -47,7 +50,7 @@ Async_suite.(
 )
 {% endhighlight %}
 
-Here we're using [Local Opens](http://caml.inria.fr/pub/docs/manual-ocaml-400/manual021.html#toc77) to avoid prefixing function names with the module name all the time, i.e. `Async_suite.(f x y z)` is the same as `Async_suite.f x y z`. We're also using the pipe function `x |> f`, which is the same as `f x`.
+Here we're using [Local Opens](http://caml.inria.fr/pub/docs/manual-ocaml-400/manual021.html#toc77) to avoid prefixing function names with the module name all the time, i.e. `Async_suite.(f x y)` is the same as `Async_suite.f x y`. We're also using the pipe function `x |> f`, which is the same as `f x`.
 
 ### The Implementation
 
@@ -70,24 +73,26 @@ type ('suite_params, 'params) t = {
 }
 {% endhighlight %}
 
-Note that a test function is expected to return a `unit Deferred.t`  and should raise `AssertionFailure` if an assertion fails.
+Note that a test function is expected to return a `unit Deferred.t` that resolves when the test is completed and should raise `AssertionFailure` if an assertion fails. For brevity I'll write `('suite_params, 'params) t` as `('a, 'b) t` henceforth.
 
 Creating the test suite and adding tests is straight forward:
 
 {% highlight ocaml %}
 (* Create a empty test suite with before- and after-hooks *)
-let create ~before_all
-           ~before
-           ~after
-           ~after_all = {
-  before_all;
-  before;
-  after;
-  after_all;
-  tests = []
-}
+let create ~before_all         (* unit ->   'a Deferred.t *)
+           ~before             (* 'a   ->   'b Deferred.t *)
+           ~after              (* 'b   -> unit Deferred.t *)
+           ~after_all =        (* 'a   -> unit Deferred.t *)
+  {
+    before_all;
+    before;
+    after;
+    after_all;
+    tests = []
+  }
 
-(* Add a test function to a test suite *)
+(* Add a test function to a test suite                  *)
+(* test : string -> 'b test -> ('a, 'b) t -> ('a, 'b) t *)
 let test name f t = { t with tests = (name, f)::t.tests }
 {% endhighlight %}
 
@@ -107,7 +112,7 @@ let test_with_hooks t suite_params (name, test) =
     | Error exn ->
         printf "%s: ERROR\n%s\n" name (Exn.to_string exn)
 
-(* run : ('suite_params, 'params) t -> unit Deferred.t *)
+(* run : ('a, 'b) t -> unit Deferred.t *)
 let run t =
   t.before_all () >>= fun suite_params ->
   let tests = List.rev t.tests in
@@ -120,20 +125,21 @@ In brief, iterate sequentially over each test function while making sure to call
 
 ### Writing Assertions
 
-Raising `AssertionFailure` can be done writing plain Ocaml code, but I've found it very helpful to define some assertion-functions myself. The following code makes it easy to assert on values of type `Deferred.Or_error.t` (which is used in the Memcached-client) and get helpful output on failures:
+Raising `AssertionFailure` can be done writing plain Ocaml code, but I've found it very helpful to define some assertion-functions myself. The following code makes it easy to assert on values of type `Deferred.Or_error.t` ([doc](https://ocaml.janestreet.com/ocaml-core/111.17.00/doc/async/#Std.Deferred.Or_error)), which is used in the Memcached-client, and get helpful output on failures:
 
 {% highlight ocaml %}
 (* signature for assertable modules *)
 module type Assertable = sig
+  type t
   val equal : t -> t -> bool
   val to_string : t -> string
 end
 
-(* AssertionError will be raised if an unexpected exception is raised *)
+(* AssertionError will be raised if an unexpected exception is raised       *)
 exception AssertionError of string
 
-(* MakeAsserter-functor will return a module with a suitable assert_equals-
-   function given an Assertable *)
+(* MakeAsserter-functor will return a module with a suitable assert_equals- *)
+(* function given an Assertable                                             *)
 module MakeAsserter (M : Assertable) = struct
   let assert_equal actual_dfd expected =
     actual_dfd >>= function
@@ -160,7 +166,7 @@ These asserters make it easy to write concise assertions:
 
 {% highlight ocaml %}
 String.assert_equal (Memcached.get  cache "mykey") "foo"
-Int64.assert_equal  (Memcached.incr cache "count") 42L
+Int64.assert_equal  (Memcached.incr cache "count" 12L) 42L
 {% endhighlight %}
 
 ### Wrap up
