@@ -172,3 +172,5 @@ Int64.assert_equal  (Memcached.incr cache "count" 12L) 42L
 ### Wrap up
 
 In this blog post we wrote a tiny library for testing code that uses Async. The resulting library makes it easy to write concise tests with life-cycle hooks and helpful test output. I wrote this out of a need to test Async code and couldn't find a suitable test library, but if I missed something, please write a comment and enlighten me.
+
+If you like this post, please vote on [Hacker News](https://news.ycombinator.com/item?id=8336500).
