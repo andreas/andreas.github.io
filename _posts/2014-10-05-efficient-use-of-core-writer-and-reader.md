@@ -137,3 +137,5 @@ So in terms of efficiency if your data is represented as a Bigstring, it's most 
 ### Wrap up
 
 The most efficient use of Reader and Writer is achieved by not copying data needlessly. For Reader this is done with `Reader.read_one_chunk_at_a_time` and returning "views" of the internal buffer. For Writer it's most efficient to schedule Bigstrings for writing with `Writer.schedule_*` or use `Writer.write_gen` to write directly to the writer's internal buffer.
+
+Achieving minimal or zero copying by obeying the mentioned guidelines make APIs a little more cumbersome though. Instead of reading and writing data with strings, reads need to return Bigsubstrings and writes must be done with Bigstrings or Bigsubstrings. Depending on your application it may or may not be worth this extra complexity.
