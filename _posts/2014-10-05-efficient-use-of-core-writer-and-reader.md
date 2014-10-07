@@ -1,7 +1,6 @@
 ---
 layout: post
 title: Efficient Use of Core Reader and Writer
-hidden: true
 ---
 
 In a [previous blog post](/2014/09/17/improved-ocaml-memcached-client-with-core-and-async/), I used [Core](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html), [Async](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html) and [bitstring](code.google.com/p/bitstring/) to write a tiny library for talking to Memcached using the binary protocol. [Reader](https://ocaml.janestreet.com/ocaml-core/latest/doc/async/#Std.Reader) and [Writer](https://ocaml.janestreet.com/ocaml-core/latest/doc/async/#Std.Writer) are the primary I/O abstractions used in [Core](https://ocaml.janestreet.com/ocaml-core/latest/doc/) and also underlies my implementation. To better understand the mechanics of Reader and Writer and how to use them efficiently, I decided to examine the implementations and APIs more closely. The following is a summary of my findings.
@@ -139,3 +138,5 @@ So in terms of efficiency if your data is represented as a Bigstring, it's most 
 The most efficient use of Reader and Writer is achieved by not copying data needlessly. For Reader this is done with `Reader.read_one_chunk_at_a_time` and returning "views" of the internal buffer. For Writer it's most efficient to schedule Bigstrings for writing with `Writer.schedule_*` or use `Writer.write_gen` to write directly to the writer's internal buffer.
 
 Achieving minimal or zero copying by obeying the mentioned guidelines make APIs a little more cumbersome though. Instead of reading and writing data with strings, reads need to return Bigsubstrings and writes must be done with Bigstrings or Bigsubstrings. Depending on your application it may or may not be worth this extra complexity.
+
+If you like this post, please vote on [Hacker News](http://andreas.github.io/2014/10/05/efficient-use-of-core-writer-and-reader/).
