@@ -22,7 +22,7 @@ In more details, this is what happens:
 
 1. A string of 10 bytes is allocated.
 2. 10 or more bytes is read from the file descriptor into the internal buffer of `reader` using read system call.
-3. 10 bytes are blitted from internal buffer of `reader` to `buffer` using [memcpy system call](http://linux.die.net/man/3/memcpy).
+3. 10 bytes are blitted from internal buffer of `reader` to `buffer` using [memcpy](http://linux.die.net/man/3/memcpy).
 
 Copying data from the internal buffer to `buffer` may be wasteful if `buffer` is not later mutated. If `buffer` is used in an immutable fashion, we can achieve the same without the wasteful copying:
 
