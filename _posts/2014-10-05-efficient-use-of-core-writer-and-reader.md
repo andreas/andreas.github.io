@@ -139,4 +139,4 @@ The most efficient use of Reader and Writer is achieved by not copying data need
 
 Achieving minimal or zero copying by obeying the mentioned guidelines make APIs a little more cumbersome though. Instead of reading and writing data with strings, reads need to return Bigsubstrings and writes must be done with Bigstrings or Bigsubstrings. Depending on your application it may or may not be worth this extra complexity.
 
-If you like this post, please vote on [Hacker News](http://andreas.github.io/2014/10/05/efficient-use-of-core-writer-and-reader/).
+If you like this post, please vote on [Hacker News](https://news.ycombinator.com/item?id=8420071).
