@@ -31,7 +31,7 @@ let handle_chunk buffer ~pos ~len =
   if len >= 10 then
     `Stop_consumed (Bigsubstring.create buffer ~pos 10, 10)
   else
-    `Continue
+    `Consumed (0, `Need len)
 in
 Reader.read_one_chunk_at_a_time reader ~handle_chunk >>= function 
 | `Eof    -> printf "Failed\n"
@@ -43,8 +43,9 @@ Using this approach we skip step 1) and 3), as the result is simply exposed as a
 Accessing the internal buffer of reader as Bigstring also allows us to read binary data in an easy fashion:
 
 {% highlight ocaml %}
-(* handle_chunk : Bigstring.t -> pos:int -> len:int ->                *)
-(*                  [`Continue | `Stop of { magic : int; ... } * int] *)
+(* handle_chunk : Bigstring.t -> pos:int -> len:int ->      *)
+(*                  [ `Consumed of int * [ `Need of int ]   *)
+(*                  | `Stop of { magic : int; ... } * int ] *)
 let handle_chunk buffer ~pos ~len =
   if len >= 24 then
     let open Bigstring in
@@ -57,7 +58,7 @@ let handle_chunk buffer ~pos ~len =
     } in
     `Stop_consumed (header, 10)
   else
-    `Continue
+    `Consumed (0, `Need 24)
 {% endhighlight %}
 
 `Bigstring` has a family of functions for parsing binary values with the naming scheme `unsafe_get_[type]_[endian]`, e.g. `unsafe_get_uint32_be`. Using any function prefixed with `unsafe_` should make you think twice. The documentation has the following note:
@@ -66,7 +67,7 @@ let handle_chunk buffer ~pos ~len =
 
 As we check the buffer length up front we should be safe.
 
-The above approach parses and copies data from the internal buffer, as it as such not zero copy. To achieve zero copying, you could use a library like [cstruct](https://github.com/mirage/ocaml-cstruct), which might be a topic for a future blog post.
+The above approach parses and copies data from the internal buffer, and is as such not zero copy. To achieve zero copying, you could use a library like [cstruct](https://github.com/mirage/ocaml-cstruct), which might be a topic for a future blog post.
 
 ### Writer
 
@@ -90,7 +91,7 @@ let buffer = Bigstring.of_string "123" in
 Writer.schedule_bigstring writer buffer
 {% endhighlight %}
 
-This avoids all copying, since `buffer` is simply added to the writer's internal queue -- we can thus avoid all copying. Note that since writing to the file descriptor is done asynchronously, it's not safe to modify `buffer` in the meantime.
+This avoids all copying, since `buffer` is simply added to the writer's internal queue. Note that since writing to the file descriptor is done asynchronously, it's not safe to modify `buffer` in the meantime.
 
 Like with Reader, the internal buffer of a Writer can be exposed. This is done through the `Writer.write_gen` function:
 
