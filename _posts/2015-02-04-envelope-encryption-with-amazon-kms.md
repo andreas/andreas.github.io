@@ -1,11 +1,12 @@
 ---
 layout: post
 title: Envelope Encryption with Amazon KMS
+redirect_from: /2015/01/04/envelope-encryption-with-amazon-kms/
 ---
 
 [Amazon Key Management Service](http://aws.amazon.com/kms/) is a service for creating and controlling encryption keys in a safe manner, using [Hardware Security Modules](http://en.wikipedia.org/wiki/Hardware_security_module) under the hood. KMS also offers hassle-free yearly key rotation, and logs all key usage to [CloudTrail](http://aws.amazon.com/cloudtrail/) by default.
 
-Using KMS, there is generally two ways to encrypt data: use the [Encrypt endpoint](http://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html) or use *envelope encryption*. This posts tries to provide an overview of the two.
+Using KMS, there are generally two ways to encrypt data: use the [Encrypt endpoint](http://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html) or use *envelope encryption*. This posts tries to provide an overview of the two.
 
 The code snippet beneath will be the scaffold for our example code, which reads the sensitive data from stdin, encrypts it, prints the ciphertext and then decrypts it again:
 

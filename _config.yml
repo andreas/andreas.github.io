@@ -20,3 +20,7 @@ author:
 version:          1.0.0
 github:
   repo:           https://github.com/andreas
+
+# Gems
+gems:
+  - jekyll-redirect-from
