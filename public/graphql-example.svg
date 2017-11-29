@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="140pt" height="240pt" viewBox="0.00 0.00 140.25 240.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<title></title>
+<desc>
+digraph G {
+  root [style=invis,height=0,shape=point];
+  user [shape=box];
+  query [shape=box];
+
+  root -> query;
+  query -> user;
+  user -> int[label=id];
+  user -> string[label=name];
+}
+</desc>
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 236)">
+<title>G</title>
+<polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-236 136.2507,-236 136.2507,4 -4,4"/>
+<!-- root -->
+<!-- query -->
+<g id="node3" class="node">
+<title>query</title>
+<polygon fill="none" stroke="#000000" points="91,-195 37,-195 37,-159 91,-159 91,-195"/>
+<text text-anchor="middle" x="64" y="-172.8" font-family="Times,serif" font-size="14.00" fill="#000000">query</text>
+</g>
+<!-- root&#45;&gt;query -->
+<g id="edge1" class="edge">
+<title>root&#45;&gt;query</title>
+<path fill="none" stroke="#000000" d="M64,-231.8422C64,-230.3261 64,-218.1219 64,-205.6107"/>
+<polygon fill="#000000" stroke="#000000" points="67.5001,-205.2569 64,-195.2569 60.5001,-205.2569 67.5001,-205.2569"/>
+</g>
+<!-- user -->
+<g id="node2" class="node">
+<title>user</title>
+<polygon fill="none" stroke="#000000" points="91,-122 37,-122 37,-86 91,-86 91,-122"/>
+<text text-anchor="middle" x="64" y="-99.8" font-family="Times,serif" font-size="14.00" fill="#000000">user</text>
+</g>
+<!-- int -->
+<g id="node4" class="node">
+<title>int</title>
+<ellipse fill="none" stroke="#000000" cx="27" cy="-18" rx="27" ry="18"/>
+<text text-anchor="middle" x="27" y="-13.8" font-family="Times,serif" font-size="14.00" fill="#000000">int</text>
+</g>
+<!-- user&#45;&gt;int -->
+<g id="edge3" class="edge">
+<title>user&#45;&gt;int</title>
+<path fill="none" stroke="#000000" d="M56.1533,-85.7616C50.9982,-73.7796 44.169,-57.9063 38.4162,-44.535"/>
+<polygon fill="#000000" stroke="#000000" points="41.6241,-43.1349 34.4569,-35.3322 35.194,-45.9014 41.6241,-43.1349"/>
+<text text-anchor="middle" x="53.4448" y="-56.8" font-family="Times,serif" font-size="14.00" fill="#000000">id</text>
+</g>
+<!-- string -->
+<g id="node5" class="node">
+<title>string</title>
+<ellipse fill="none" stroke="#000000" cx="102" cy="-18" rx="30.0035" ry="18"/>
+<text text-anchor="middle" x="102" y="-13.8" font-family="Times,serif" font-size="14.00" fill="#000000">string</text>
+</g>
+<!-- user&#45;&gt;string -->
+<g id="edge4" class="edge">
+<title>user&#45;&gt;string</title>
+<path fill="none" stroke="#000000" d="M72.0588,-85.7616C77.3182,-73.8589 84.2742,-58.1164 90.1577,-44.801"/>
+<polygon fill="#000000" stroke="#000000" points="93.3724,-46.1854 94.2127,-35.6239 86.9696,-43.3562 93.3724,-46.1854"/>
+<text text-anchor="middle" x="100.1587" y="-56.8" font-family="Times,serif" font-size="14.00" fill="#000000">name</text>
+</g>
+<!-- query&#45;&gt;user -->
+<g id="edge2" class="edge">
+<title>query&#45;&gt;user</title>
+<path fill="none" stroke="#000000" d="M64,-158.9551C64,-150.8828 64,-141.1764 64,-132.1817"/>
+<polygon fill="#000000" stroke="#000000" points="67.5001,-132.0903 64,-122.0904 60.5001,-132.0904 67.5001,-132.0903"/>
+</g>
+</g>
+</svg>
