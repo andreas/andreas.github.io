@@ -14,7 +14,7 @@ baseurl:          /
 author:
   name:           Andreas Garnæs
   url:            https://twitter.com/cuvius
-  email:          andreas@garnaes.dk
+  email:          andreas.garnaes@gmail.com
 
 # Custom vars
 version:          1.0.0
