@@ -1,9 +1,9 @@
 ---
 layout: post
-title: How to test Async Ocaml code
+title: How to test Async OCaml code
 ---
 
-In the [previous blog post]({% post_url 2014-09-17-improved-ocaml-memcached-client-with-core-and-async %}), we used [Core](https://github.com/janestreet/core) and [Async](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html) to write a tiny library for talking to Memcached using the [binary protocol]({% post_url 2014-08-22-implementing-the-binary-memcached-protocol-with-ocaml-and-bitstring  %}). I wanted to write tests for the library in a readable and succint manner to ensure correctness -- the type system cannot ensure binary data is parsed correctly after all. The regular go-to tool for testing Ocaml code is [OUnit](http://ounit.forge.ocamlcore.org/api-ounit/index.html), but this doesn't work well with Async. As I couldn't find a suitable library, I decided to write something myself.
+In the [previous blog post]({% post_url 2014-09-17-improved-ocaml-memcached-client-with-core-and-async %}), we used [Core](https://github.com/janestreet/core) and [Async](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html) to write a tiny library for talking to Memcached using the [binary protocol]({% post_url 2014-08-22-implementing-the-binary-memcached-protocol-with-ocaml-and-bitstring  %}). I wanted to write tests for the library in a readable and succint manner to ensure correctness -- the type system cannot ensure binary data is parsed correctly after all. The regular go-to tool for testing OCaml code is [OUnit](http://ounit.forge.ocamlcore.org/api-ounit/index.html), but this doesn't work well with Async. As I couldn't find a suitable library, I decided to write something myself.
 
 ### The Goal
 
@@ -125,7 +125,7 @@ In brief, iterate sequentially over each test function while making sure to call
 
 ### Writing Assertions
 
-Raising `AssertionFailure` can be done writing plain Ocaml code, but I've found it very helpful to define some assertion-functions myself. The following code makes it easy to assert on values of type `Deferred.Or_error.t` ([doc](https://ocaml.janestreet.com/ocaml-core/111.17.00/doc/async/#Std.Deferred.Or_error)), which is used in the Memcached-client, and get helpful output on failures:
+Raising `AssertionFailure` can be done writing plain OCaml code, but I've found it very helpful to define some assertion-functions myself. The following code makes it easy to assert on values of type `Deferred.Or_error.t` ([doc](https://ocaml.janestreet.com/ocaml-core/111.17.00/doc/async/#Std.Deferred.Or_error)), which is used in the Memcached-client, and get helpful output on failures:
 
 {% highlight ocaml %}
 (* signature for assertable modules *)

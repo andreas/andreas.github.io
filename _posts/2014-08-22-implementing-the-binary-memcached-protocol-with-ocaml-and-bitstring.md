@@ -1,9 +1,9 @@
 ---
 layout: post
-title: Implementing the Binary Memcached Protocol with Ocaml and Bitstring
+title: Implementing the Binary Memcached Protocol with OCaml and Bitstring
 ---
 
-I've known Ocaml for a while, but I never really put it to use outside of academic work back in university. After reading [Real World Ocaml](https://realworldocaml.org/) my excitement for Ocaml reappeared and I wanted to try out [Core](https://ocaml.janestreet.com/ocaml-core/latest/doc/) and [Async](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html). At the back of my mind, I also remembered [bitstring](https://code.google.com/p/bitstring/), an awesome Ocaml library for creating and pattern matching on bitstrings. To cover all three, I decided to write a Memcached client using the [binary protocol](https://code.google.com/p/memcached/wiki/MemcacheBinaryProtocol).
+I've known OCaml for a while, but I never really put it to use outside of academic work back in university. After reading [Real World Ocaml](https://realworldocaml.org/) my excitement for Ocaml reappeared and I wanted to try out [Core](https://ocaml.janestreet.com/ocaml-core/latest/doc/) and [Async](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html). At the back of my mind, I also remembered [bitstring](https://code.google.com/p/bitstring/), an awesome Ocaml library for creating and pattern matching on bitstrings. To cover all three, I decided to write a Memcached client using the [binary protocol](https://code.google.com/p/memcached/wiki/MemcacheBinaryProtocol).
 
 I'll try to cover my experience in a number of blog posts. In this first post, I'll be talking about using bitstring for parsing and constructing binary data for the Memcached protocol.
 
@@ -259,4 +259,4 @@ Obvious this is still a very low level interface, but it's easy to build on top 
 
 ### Next time...
 
-In this blog post we've developed a primitive Ocaml library for talking to Memcached with the binary protocol using [bitstring](https://code.google.com/p/bitstring/). The code is based on the standard library, which is honest not that great, and all IO is synchronous. In the next installment we'll try using [Core](https://ocaml.janestreet.com/ocaml-core/latest/doc/) and [Async](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html) for asynchronous IO. Stay tuned!
+In this blog post we've developed a primitive OCaml library for talking to Memcached with the binary protocol using [bitstring](https://code.google.com/p/bitstring/). The code is based on the standard library, which is honest not that great, and all IO is synchronous. In the next installment we'll try using [Core](https://ocaml.janestreet.com/ocaml-core/latest/doc/) and [Async](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html) for asynchronous IO. Stay tuned!

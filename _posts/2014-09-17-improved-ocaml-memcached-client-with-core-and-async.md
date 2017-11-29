@@ -3,11 +3,11 @@ layout: post
 title: Improved OCaml Memcached client with Core and Async
 ---
 
-In the [previous blog post]({% post_url 2014-08-22-implementing-the-binary-memcached-protocol-with-ocaml-and-bitstring %}), we implemented a simple Ocaml library for talking to Memcached with the binary protocol using [bitstring](https://code.google.com/p/bitstring/). The code uses the baked-in standard library and synchronous IO (blocking), so a lot of time will be wasted waiting for IO. The standard library replacement [Core](https://github.com/janestreet/core) offers cooperative threading with callbacks through [Async](https://github.com/janestreet/async), similar to Javascript, [EventMachine](http://rubyeventmachine.com/) for Ruby or many others. In this blog post we'll try to rewrite the code from the previous post to use asynchronous IO with [Async](https://github.com/janestreet/async).
+In the [previous blog post]({% post_url 2014-08-22-implementing-the-binary-memcached-protocol-with-ocaml-and-bitstring %}), we implemented a simple OCaml library for talking to Memcached with the binary protocol using [bitstring](https://code.google.com/p/bitstring/). The code uses the baked-in standard library and synchronous IO (blocking), so a lot of time will be wasted waiting for IO. The standard library replacement [Core](https://github.com/janestreet/core) offers cooperative threading with callbacks through [Async](https://github.com/janestreet/async), similar to Javascript, [EventMachine](http://rubyeventmachine.com/) for Ruby or many others. In this blog post we'll try to rewrite the code from the previous post to use asynchronous IO with [Async](https://github.com/janestreet/async).
 
 ### IO with Async
 
-The primary IO abstractions in the Ocaml standard library are [in\_channel and out\_channel](http://caml.inria.fr/pub/docs/manual-ocaml/libref/Pervasives.html#6_Inputoutput), while in Core/Async it's [Reader](https://ocaml.janestreet.com/ocaml-core/111.17.00/doc/async/#Std.Reader) and [Writer](https://ocaml.janestreet.com/ocaml-core/111.17.00/doc/async/#Std.Writer). Reading and writing with Core/Async is asynchronous (non-blocking), so results are not returned immediately. If we for example examine the signature of `Reader.really_read` it looks like this:
+The primary IO abstractions in the OCaml standard library are [in\_channel and out\_channel](http://caml.inria.fr/pub/docs/manual-ocaml/libref/Pervasives.html#6_Inputoutput), while in Core/Async it's [Reader](https://ocaml.janestreet.com/ocaml-core/111.17.00/doc/async/#Std.Reader) and [Writer](https://ocaml.janestreet.com/ocaml-core/111.17.00/doc/async/#Std.Writer). Reading and writing with Core/Async is asynchronous (non-blocking), so results are not returned immediately. If we for example examine the signature of `Reader.really_read` it looks like this:
 
 {% highlight ocaml %}
 (* really_read t pos len buffer reads until it fills len bytes of buffer starting *)
@@ -55,7 +55,7 @@ Writer.write my_writer "foo"
 
 You might notice that `write` does not return a deferred: `write` only queues the write in a buffer, and another Async microthread actually writes to the OS buffer. If you want to ensure that the write has been flushed, you can call `Writer.flush : unit -> unit Deferred.t`. An exception will be raised if any errors occur while transferring data to the OS buffer. How to handle exceptions in Async is a topic of another blog post (if you're curious [start here](https://ocaml.janestreet.com/ocaml-core/latest/doc/async/#Std.Monitor)).
 
-We've covered enough to update the client library to use Async now, but if you want to learn more about Async, you can also read [Dummy's Guide to Async](http://janestreet.github.io/guide-async.html) from Jane Street or the excellent chapter on Async in [Real World Ocaml](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html).
+We've covered enough to update the client library to use Async now, but if you want to learn more about Async, you can also read [Dummy's Guide to Async](http://janestreet.github.io/guide-async.html) from Jane Street or the excellent chapter on Async in [Real World OCaml](https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html).
 
 ### Updating the Client
 
