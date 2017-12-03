@@ -121,7 +121,7 @@ The challenge is to define OCaml types for GraphQL types and fields, which captu
 
 If we can capture this invariant in the type system, then only well-formed GraphQL schemas will compile and we can avoid exceptions when executing a query.
 
-As a runnning example, we'll try to expose a simple user type as a GraphQL object:
+As a running example, we'll try to expose a simple user type as a GraphQL object:
 
 ```ocaml
 type user = {
