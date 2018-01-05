@@ -3,7 +3,7 @@ layout: post
 title: Modeling GraphQL Type Modifiers with GADTs (part 2)
 ---
 
-This blog post is the second in a series, which describes how to implement a type-safe GraphQL library in OCaml (see [part 1 here](/posts/2017-29-11-type-safe-graphql-with-ocaml)).
+This blog post is the second in a series, which describes how to implement a type-safe GraphQL library in OCaml (see [part 1 here]({% post_url 2017-11-29-type-safe-graphql-with-ocaml-part-1 %})).
 
 In part 1, we defined two OCaml types, `Graphql.typ` and `Graphql.field`, to represent GraphQL objects, scalars and fields. We identified a field invariant which guarantees at compile-time that a schema is well-constructed: resolve functions must return values of the right type. In this part we will extend `Graphql.typ` to handle non-nullable types and list types -- collectively known as *type modifiers*.
 
