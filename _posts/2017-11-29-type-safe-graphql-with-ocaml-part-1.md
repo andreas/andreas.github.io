@@ -321,7 +321,7 @@ These are all topics for future blog posts.
 
 ## Conclusion and Next Up
 
-This blog post describes a composable, extensible core for a GraphQL server implementation, which allows introspection and ensures to runtime exceptions by capturing complex invariants in the type system. In turn, this means users of the library can enjoy compile-time guarantees and build high-quality GraphQL APIs.
+This blog post describes a composable, extensible core for a GraphQL server implementation, which allows introspection and ensures no runtime exceptions by capturing complex invariants in the type system. In turn, this means users of the library can enjoy compile-time guarantees and build high-quality GraphQL APIs.
 
 Future blog posts will build more features on top of this core, adding support for:
 
