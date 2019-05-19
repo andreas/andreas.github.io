@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Modeling GraphQL Type Modifiers with GADTs (part 2)
+redirect_from: 2018/01/05/modeling-graphql-type-modifiers-with-gadts
 ---
 
 This blog post is the second in a series, which describes how to implement a type-safe GraphQL library in OCaml (see [part 1 here]({% post_url 2017-11-29-type-safe-graphql-with-ocaml-part-1 %})).
