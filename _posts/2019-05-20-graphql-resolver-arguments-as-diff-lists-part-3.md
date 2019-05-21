@@ -1,6 +1,7 @@
 ---
 layout: post
 title: GraphQL Resolver Arguments as Diff Lists (part 3)
+redirect_from: /2019/05/17/graphql-resolver-arguments-as-diff-lists-part-3/
 ---
 
 This blog post is the third in a series, which describes how to implement a type-safe GraphQL server library in OCaml. In [part 1]({% post_url 2017-11-29-type-safe-graphql-with-ocaml-part-1 %}), we described how define GraphQL scalars and objects in a type-safe manner, and in [part 2]({% post_url 2018-01-05-modeling-graphql-type-modifiers-with-gadts-part-2 %}) we extended this to include the notion of type modifiers (non-null and list).
@@ -283,7 +284,7 @@ The first thing to note about `apply` is the use of [locally abstract types](htt
 We'll consider each case separately:
 
 - **Base case** (`[]`): In this case, `arg_list` must be of type `(out, out) arg_list`, which further means `f` must be of type `out`. The computation is done and we can return this value.
-- **Inductive case** (`arg :: arg_list'`): Here `arg` is of type `'a t` and `arg_list'` is of type `(out, 'a -> 'g) arg_list`. We further know `f` is of type `'a -> 'g`. By calling `get`, we can get a value of type `'a`, and apply it to `f` to get a value `f'` of type `'g`. This means we can recursively call `apply` with `arg_list'` and `f'`.
+- **Inductive case** (`arg :: arg_list'`): Here `arg` is of type `'a t` and `arg_list'` is of type `(out, 'a -> 'g) arg_list`. We further know `f` is of type `'a -> 'g`. By calling `get` with `arg`, we can get a value of type `'a`, and apply it to `f` to get a value `f'` of type `'g`. This means we can recursively call `apply` with `arg_list'` and `f'`.
 
 The most important point is that the type checker ensures that the function `f` agree with the argument list `arg_list`.
 
