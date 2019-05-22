@@ -19,7 +19,7 @@ type Query {
 }
 ```
 
-The definition of objects was restricted to only allow fields without arguments, however. That is, defining a field such as `search(query: String!, limit!): [User]` to search for users was impossible.
+The definition of objects was restricted to only allow fields without arguments, however. That is, defining a field such as `search(query: String!, limit!: Int!): [User]` to search for users was impossible.
 
 In this post, we will extend our library such that fields can have arguments, while keeping the guarantee that only well-formed GraphQL schemas will compile.
 
